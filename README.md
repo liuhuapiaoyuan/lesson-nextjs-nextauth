@@ -187,7 +187,19 @@ export default async function Home() {
 ```
 
 
-代码仓库：[https://github.com/zhengxs2018/nextjs-nextauth](https://github.com/zhengxs2018/nextjs-nextauth)
+代码仓库：[https://github.com/liuhuapiaoyuan/lesson-nextjs-nextauth.git](https://github.com/liuhuapiaoyuan/lesson-nextjs-nextauth.git)
 
 
-### 
+### 思考
+
+上面一个代码集成起来虽然简单，但实际上我们需要的登录/权限管理的功能远不止这些，比如：
+
+- 多种登录方式：比如邮箱、手机号、GITHUB,GOOGLE等
+- 账号信息如何保存？多种渠道授权登录如何保存？
+- 如何开发特定的provider，来适配国内的 `微信登录`,`小程序登录`,`QQ`等渠道
+- 多种登录方式的联动：比如手机号登录可以绑定微信、微博等
+- 授权问题解决了，如何解决鉴权问题？(多种权限控制：比如管理员、普通用户、游客等)
+
+`Next-Auth`虽然提供了很多功能，但是要集成到系统中，我们还需要做很多准备工作。作为一款授权服务的框架，`Next-Auth`的功能和生态都很强大，但是我们需要自己去摸索，才能真正掌握它。
+
+再接下来的系列，我们来盘他！
