@@ -62,6 +62,7 @@ export default function WeChat<P extends WeChatProfile>(
 
   const authorizationEndpointUrl = WEHCAT_PLATFORM_AuthorizationEndpointUrl[platformType]
   const authorizationScope = platformType === "OfficialAccount" ? "snsapi_userinfo" : "snsapi_login"
+
   const authorization: AuthorizationEndpointHandler = {
     url: authorizationEndpointUrl,
     params: {

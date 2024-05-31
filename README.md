@@ -5,8 +5,7 @@
 
 1. 使用`next-auth/provider`快速集成第三方授权登录
 2. 如何自定义`provider`接入国内的微信登录登
-3. 使用`oidc`连接到自定义的授权服务器
-4. 多种第三方账号绑定
+3. 如何通过数据库`Adapter`完成多第三方账号绑定[未完待续]
 
 今天我们先来尝试一下`Github`登录，以及国内最流行的`微信登录`。
 
@@ -99,7 +98,9 @@ export const { signIn, signOut, auth, handlers } = NextAuth(config);
 
 ### Step2: 自定义`provider/wechat`微信登录
 
-本身`next-auth`是支持直接通过配置完成标准`oauth`服务的接入，但是奈何微信官方对此
+本身`next-auth`是支持直接通过配置完成标准`oauth`服务的接入，但是奈何微信官方没有兼容标准的`oauth2`协议，所以我们要自定义`authorization`、`token`、`userinfo`的获取接口。
+
+代码详细仓库.
 
 ### Step3:配置`微信登录`Provider
 
@@ -139,3 +140,26 @@ npm run  dev --hostname 192.168.2.4
 ![微信授权登录](doc/oauth/image-10.png)
 
 ![完成登录](doc/oauth/image12.png)
+
+### [源码地址](https://github.com/liuhuapiaoyuan/lesson-nextjs-nextauth/tree/lesson2-3rdauth)
+
+### 重点讲解如何自定义`provider`
+
+`next-auth`只要我们返回一个合理的对象就可以完成`oauth`或者`oidc`的第三方接入点，我们来看看下面的代码
+
+![WechatProvider代码](doc/oauth/wechatprovider.png)
+
+源码有点长，但是实际上代码主要关注以下几个点就可以了：
+
+- 返回的数据结构，需要包含必须的字段
+- 兼容处理微信`authorization`、`token`、`userinfo`的获取接口
+- 微信返回的用户信息和 profile 的转化
+
+## 总结
+
+本集我们介绍了`next-auth`的基本用法，以及集成第三方登录的几种姿势。
+
+- `next-auth/provider`快速集成第三方授权登录
+- `oauth`连接器使得我们可以很容易的自定义第三方登录协议
+
+下一集我们将介绍`next-auth`的`adapter`机制，如何通过数据库`Adapter`完成多第三方账号绑定
