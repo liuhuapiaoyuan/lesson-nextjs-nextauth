@@ -118,4 +118,4 @@ npm run  dev --hostname 192.168.2.4
 
 ![微信授权登录](doc/oauth/image-10.png)
 
-![完成登录](doc/oauth/image.png)
+![完成登录](doc/oauth/image12.png)
