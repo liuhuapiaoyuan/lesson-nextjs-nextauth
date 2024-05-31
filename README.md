@@ -99,9 +99,29 @@ export const { signIn, signOut, auth, handlers } = NextAuth(config);
 
 ### Step2: 自定义`provider/wechat`微信登录
 
+本身`next-auth`是支持直接通过配置完成标准`oauth`服务的接入，但是奈何微信官方对此
+
 ### Step3:配置`微信登录`Provider
 
 > 修改`src/auth.ts`
+
+```typescript
+// 登录配置
+const config: NextAuthConfig = {
+  providers: [
+    Github,
+    WeChat,
+    Credentials({
+      credentials: {
+        username: { label: "账号" },
+        password: { label: "密码", type: "password" },
+      },
+      authorize: async ({ username, password }) =>
+        mockUser(username + "", password + ""),
+    }),
+  ],
+};
+```
 
 ### Step4:测试`微信登录`
 

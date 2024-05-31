@@ -1,9 +1,18 @@
+import { AuthError } from "next-auth"
 import { AuthorizationEndpointHandler, OAuth2Config, OAuthUserConfig, TokenEndpointHandler, UserinfoEndpointHandler } from "next-auth/providers"
 
 
 type WechatPlatform = {
   platformType?: "OfficialAccount" | "WebsiteApp"
 }
+
+const WEHCAT_PLATFORM_AuthorizationEndpointUrl = {
+  OfficialAccount: "https://open.weixin.qq.com/connect/oauth2/authorize",
+  WebsiteApp: "https://open.weixin.qq.com/connect/qrconnect",
+}
+
+const Wehcat_TokenEndpointUrl = "https://api.weixin.qq.com/sns/oauth2/access_token"
+
 export interface WeChatProfile {
   /** 用户在公众号下的唯一标识 */
   openid: string
@@ -29,6 +38,7 @@ export interface WeChatProfile {
 
 
 
+const Wechat_UserinfoEndPoint = "https://api.weixin.qq.com/sns/userinfo"
 /**
  * 微信公众号/微信网页应用 授权登录服务
  * 
@@ -47,15 +57,11 @@ export default function WeChat<P extends WeChatProfile>(
   } = options
 
   if (platformType !== "OfficialAccount" && platformType !== "WebsiteApp") {
-    throw new Error("Invalid plaformType")
+    throw new AuthError("Invalid WehcatPlatformType")
   }
 
-  const authorizationEndpointUrl =
-    platformType === "OfficialAccount"
-      ? "https://open.weixin.qq.com/connect/oauth2/authorize"
-      : "https://open.weixin.qq.com/connect/qrconnect"
-  const authorizationScope =
-    platformType === "OfficialAccount" ? "snsapi_userinfo" : "snsapi_login"
+  const authorizationEndpointUrl = WEHCAT_PLATFORM_AuthorizationEndpointUrl[platformType]
+  const authorizationScope = platformType === "OfficialAccount" ? "snsapi_userinfo" : "snsapi_login"
   const authorization: AuthorizationEndpointHandler = {
     url: authorizationEndpointUrl,
     params: {
@@ -66,9 +72,8 @@ export default function WeChat<P extends WeChatProfile>(
     },
   }
 
-  const tokenEndpointUrl = "https://api.weixin.qq.com/sns/oauth2/access_token"
   const token: TokenEndpointHandler = {
-    url: tokenEndpointUrl,
+    url: Wehcat_TokenEndpointUrl,
     params: {
       appid: clientId,
       secret: clientSecret,
@@ -89,7 +94,7 @@ export default function WeChat<P extends WeChatProfile>(
   }
 
   const userinfo: UserinfoEndpointHandler = {
-    url: "https://api.weixin.qq.com/sns/userinfo",
+    url: Wechat_UserinfoEndPoint,
     // 由于微信不是标准的 OAuth2 协议，所以需要手动设置 access_token 和 openid 参数
     async request({ tokens, provider }: any) {
       const url = new URL(provider.userinfo?.url!)
