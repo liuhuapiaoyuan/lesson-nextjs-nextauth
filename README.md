@@ -1,7 +1,21 @@
 ## 一起干翻next-auth@5.0系列(二): 各种姿势集成第三方登录
 
-上一集我们提到了 next-auth 的基本用法，包括如何安装、配置、使用。这一集我们来集成第三方登录。
-第三方登录主要从几个方面思考：
+**目录**
+
+- `先来试试Github登录`
+  - `Step1:开通Github App`
+  - `Step2:使用next-auth/provider集成Github登录`
+- `自定义 Provider，我要接入微信登录`
+  - `Step1:创建微信登录应用`
+  - `Step2: 自定义provider/wechat微信登录`
+  - `Step3:配置微信登录Provider`
+  - `Step4:测试微信登录`
+  - `源码地址`
+  - `重点讲解如何自定义provider`
+- `总结`
+
+> 上一集我们提到了 next-auth 的基本用法，包括如何安装、配置、使用。这一集我们来集成第三方登录。
+> 第三方登录主要从几个方面思考：
 
 1. 使用`next-auth/provider`快速集成第三方授权登录
 2. 如何自定义`provider`接入国内的微信登录登
@@ -17,7 +31,7 @@
 
 1. 打开网址：[Github App](https://github.com/settings/apps)，点击`New GitHub App`按钮。
 2. 填写字段如下:
-   ![Create Github App](doc/oauth/image.png)
+   ![Create Github App](https://gitee.com/sample_school/lesson-nextjs-nextauth/tree/lesson2-3rdauth/doc/oauth/image.png)
 
 **注意**：把 webhook 的 active 关闭掉
 **非常重要**：`callback` 注意填写你的回调地址：`[origin]/api/auth/callback/github`，其中`[origin]`是你的网站域名。我们在这里填写`http://localhost:3000`
@@ -26,7 +40,7 @@
 
 4. 创建成功过后，点击 `Generate a new client secret` 按钮，创建应用密钥。
 
-![Generate a new client secret](doc/oauth/image-2.png)
+![Generate a new client secret](https://gitee.com/sample_school/lesson-nextjs-nextauth/tree/lesson2-3rdauth/doc/oauth/image-2.png)
 
 5. 在`.env`文件中添加以下内容:
 
@@ -73,13 +87,13 @@ const config: NextAuthConfig = {
 export const { signIn, signOut, auth, handlers } = NextAuth(config);
 ```
 
-![登录](doc/oauth/image-3.png)
+![登录](https://gitee.com/sample_school/lesson-nextjs-nextauth/tree/lesson2-3rdauth/doc/oauth/image-3.png)
 
 > 注意：授权登录的时候请务必访问`http://localhost:3000`，要和你前面填写的`callback地址`一致
 
-![github登录](doc/oauth/image-4.png)
+![github登录](https://gitee.com/sample_school/lesson-nextjs-nextauth/tree/lesson2-3rdauth/doc/oauth/image-4.png)
 
-![登录成功](doc/oauth/image-5.png)
+![登录成功](https://gitee.com/sample_school/lesson-nextjs-nextauth/tree/lesson2-3rdauth/doc/oauth/image-5.png)
 
 ## 自定义 Provider，我要接入`微信登录`
 
@@ -88,13 +102,13 @@ export const { signIn, signOut, auth, handlers } = NextAuth(config);
 ### Step1:创建`微信登录`应用
 
 微信登录需要先创建`微信公众平台`应用，并配置好回调地址。
-案例这边我们选择(`微信公众平台接口测试`)[https://mp.weixin.qq.com/debug/cgi-bin/sandbox?t=sandbox/login]
+案例这边我们选择 [`微信公众平台接口测试`](https://mp.weixin.qq.com/debug/cgi-bin/sandbox?t=sandbox/login)
 
-![配置回调地址](doc/oauth/image-6.png)
+![配置回调地址](https://gitee.com/sample_school/lesson-nextjs-nextauth/tree/lesson2-3rdauth/doc/oauth/image-6.png)
 
 **注意**填写你的回调地址：我们在这里填写`http://192.168.2.4:3000`，因为微信不需要填写完整的回调，只要校验`域名`，而且注册发现，它不支持`localhost`，所以我们用`192.168.2.4`。这边通过`ipconfig`查看本机的`ip`。
 
-![配置回调地址2](doc/oauth/image-7.png)
+![配置回调地址2](https://gitee.com/sample_school/lesson-nextjs-nextauth/tree/lesson2-3rdauth/doc/oauth/image-7.png)
 
 ### Step2: 自定义`provider/wechat`微信登录
 
@@ -132,22 +146,24 @@ const config: NextAuthConfig = {
 npm run  dev --hostname 192.168.2.4
 ```
 
-![IPq启动](doc/oauth/image-9.png)
+![IPq启动](https://gitee.com/sample_school/lesson-nextjs-nextauth/tree/lesson2-3rdauth/doc/oauth/image-9.png)
 
 比较麻烦的是需要下载`微信开发者工具`进行体验，注意要切换到`公众号网页调试`的模式
-![微信登录](doc/oauth/image-8.png)
+![微信登录](https://gitee.com/sample_school/lesson-nextjs-nextauth/tree/lesson2-3rdauth/doc/oauth/image-8.png)
 
-![微信授权登录](doc/oauth/image-10.png)
+![微信授权登录](https://gitee.com/sample_school/lesson-nextjs-nextauth/tree/lesson2-3rdauth/doc/oauth/image-10.png)
 
-![完成登录](doc/oauth/image12.png)
+![完成登录](https://gitee.com/sample_school/lesson-nextjs-nextauth/tree/lesson2-3rdauth/doc/oauth/image12.png)
 
-### [源码地址](https://github.com/liuhuapiaoyuan/lesson-nextjs-nextauth/tree/lesson2-3rdauth)
+### 源码学习：
+
+[源码地址](https://github.com/liuhuapiaoyuan/lesson-nextjs-nextauth/tree/lesson2-3rdauth)
 
 ### 重点讲解如何自定义`provider`
 
 `next-auth`只要我们返回一个合理的对象就可以完成`oauth`或者`oidc`的第三方接入点，我们来看看下面的代码
 
-![WechatProvider代码](doc/oauth/wechatprovider.png)
+![WechatProvider代码](https://gitee.com/sample_school/lesson-nextjs-nextauth/tree/lesson2-3rdauth/doc/oauth/wechatprovider.png)
 
 源码有点长，但是实际上代码主要关注以下几个点就可以了：
 
