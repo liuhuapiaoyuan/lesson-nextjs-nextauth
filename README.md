@@ -18,7 +18,7 @@
 
 1. 打开网址：[Github App](https://github.com/settings/apps)，点击`New GitHub App`按钮。
 2. 填写字段如下:
-   ![Create Github App](image.png)
+   ![Create Github App](doc/oauth/image.png)
 
 **注意**：把 webhook 的 active 关闭掉
 **非常重要**：`callback` 注意填写你的回调地址：`[origin]/api/auth/callback/github`，其中`[origin]`是你的网站域名。我们在这里填写`http://localhost:3000`
@@ -27,7 +27,7 @@
 
 4. 创建成功过后，点击 `Generate a new client secret` 按钮，创建应用密钥。
 
-![Generate a new client secret](image-2.png)
+![Generate a new client secret](doc/oauth/image-2.png)
 
 5. 在`.env`文件中添加以下内容:
 
@@ -74,13 +74,13 @@ const config: NextAuthConfig = {
 export const { signIn, signOut, auth, handlers } = NextAuth(config);
 ```
 
-![登录](image-3.png)
+![登录](doc/oauth/image-3.png)
 
 > 注意：授权登录的时候请务必访问`http://localhost:3000`，要和你前面填写的`callback地址`一致
 
-![github登录](image-4.png)
+![github登录](doc/oauth/image-4.png)
 
-![登录成功](image-5.png)
+![登录成功](doc/oauth/image-5.png)
 
 ## 自定义 Provider，我要接入`微信登录`
 
@@ -91,11 +91,11 @@ export const { signIn, signOut, auth, handlers } = NextAuth(config);
 微信登录需要先创建`微信公众平台`应用，并配置好回调地址。
 案例这边我们选择(`微信公众平台接口测试`)[https://mp.weixin.qq.com/debug/cgi-bin/sandbox?t=sandbox/login]
 
-![配置回调地址](image-6.png)
+![配置回调地址](doc/oauth/image-6.png)
 
 **注意**填写你的回调地址：我们在这里填写`http://192.168.2.4:3000`，因为微信不需要填写完整的回调，只要校验`域名`，而且注册发现，它不支持`localhost`，所以我们用`192.168.2.4`。这边通过`ipconfig`查看本机的`ip`。
 
-![配置回调地址2](image-7.png)
+![配置回调地址2](doc/oauth/image-7.png)
 
 ### Step2: 自定义`provider/wechat`微信登录
 
@@ -111,11 +111,11 @@ export const { signIn, signOut, auth, handlers } = NextAuth(config);
 npm run  dev --hostname 192.168.2.4
 ```
 
-![IPq启动](image-9.png)
+![IPq启动](doc/oauth/image-9.png)
 
 比较麻烦的是需要下载`微信开发者工具`进行体验，注意要切换到`公众号网页调试`的模式
-![微信登录](image-8.png)
+![微信登录](doc/oauth/image-8.png)
 
-![微信授权登录](image-10.png)
+![微信授权登录](doc/oauth/image-10.png)
 
-![完成登录](image-11.png)
+![完成登录](doc/oauth/image.png)

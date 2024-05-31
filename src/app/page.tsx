@@ -17,6 +17,25 @@ export default async function Home() {
           priority
         />
         <div>当前账号信息 ：{session?.user?.email ?? "未登录"}</div>
+        {
+          session?.user && <>
+            <div>昵称：{session?.user?.name}</div>
+            <div className="flex gap-1 items-start">
+              <div>
+                头像：
+              </div>
+              <img
+                src={session?.user?.image}
+                alt="头像"
+                width={50}
+                height={50}
+                className="rounded-full"
+              />
+
+            </div>
+
+          </>
+        }
         <div className="flex gap-4">
           <SignInButton />
           {session?.user && <SignOutButton />}
