@@ -102,7 +102,9 @@ export const { signIn, signOut, auth, handlers } = NextAuth(config);
 ### Step1:创建`微信登录`应用
 
 微信登录需要先创建`微信公众平台`应用，并配置好回调地址。
-案例这边我们选择 [`微信公众平台接口测试`](https://mp.weixin.qq.com/debug/cgi-bin/sandbox?t=sandbox/login)
+案例这边我们选择 ： [微信公众平台接口测试](https://mp.weixin.qq.com/debug/cgi-bin/sandbox?t=sandbox/login) https://mp.weixin.qq.com/debug/cgi-bin/sandbox?t=sandbox/login
+
+注册方法就不多讲了，很简单。
 
 ![配置回调地址](https://gitee.com/sample_school/lesson-nextjs-nextauth/tree/lesson2-3rdauth/doc/oauth/image-6.png)
 
