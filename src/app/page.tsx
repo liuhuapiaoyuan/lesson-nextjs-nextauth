@@ -17,13 +17,13 @@ export default async function Home() {
           priority
         />
         <div>当前账号信息 ：{session?.user?.email ?? "未登录"}</div>
-        {
-          session?.user && <>
+        {session?.user && (
+          <>
+            <code>{JSON.stringify(session.user, null, 2)}</code>
+            <div>userId：{session?.user?.id}</div>
             <div>昵称：{session?.user?.name}</div>
             <div className="flex gap-1 items-start">
-              <div>
-                头像：
-              </div>
+              <div>头像：</div>
               <img
                 src={session?.user?.image}
                 alt="头像"
@@ -31,11 +31,9 @@ export default async function Home() {
                 height={50}
                 className="rounded-full"
               />
-
             </div>
-
           </>
-        }
+        )}
         <div className="flex gap-4">
           <SignInButton />
           {session?.user && <SignOutButton />}
