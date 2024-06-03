@@ -7,6 +7,7 @@ generator client {
   provider = "prisma-client-js"
 }
  
+// 本系统账号
 model User {
   id            String          @id @default(cuid())
   name          String?
@@ -17,7 +18,7 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
- 
+// 第三方账号
 model Account {
   id                String  @id @default(cuid())
   userId            String?

@@ -5,9 +5,10 @@ import Gitee from "./lib/auth/provider/Gitee";
  
 const AuthConfig: NextAuthConfig = {
   session: {
-    strategy: "jwt",
+    // 使用JWT模式替换数据库模式，支持Nextjs的Edge模式
+    strategy: "jwt",  
   },
-  providers: [ Gitee],
+  providers: [ Gitee ],
   callbacks: {
     session: async ({ session, token }) => {
       if (token?.sub) {
