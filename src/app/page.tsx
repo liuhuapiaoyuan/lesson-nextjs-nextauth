@@ -16,10 +16,9 @@ export default async function Home() {
           height={38}
           priority
         />
-        <div>当前账号信息 ：{session?.user?.email ?? "未登录"}</div>
+        <div>当前账号信息 ：{session?.user?.id ?? "未登录"}</div>
         {session?.user && (
           <>
-            <code>{JSON.stringify(session.user, null, 2)}</code>
             <div>userId：{session?.user?.id}</div>
             <div>昵称：{session?.user?.name}</div>
             <div className="flex gap-1 items-start">
@@ -32,6 +31,7 @@ export default async function Home() {
                 className="rounded-full"
               />
             </div>
+            <code>{JSON.stringify(session.user, null, 2)}</code>
           </>
         )}
         <div className="flex gap-4">

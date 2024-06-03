@@ -14,17 +14,13 @@ model User {
   emailVerified DateTime?
   image         String?
   accounts      Account[]
-  sessions      Session[]
-  // Optional for WebAuthn support
-  Authenticator Authenticator[]
- 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
  
 model Account {
   id                String  @id @default(cuid())
-  userId            String
+  userId            String?
   type              String
   provider          String
   providerAccountId String
@@ -39,42 +35,8 @@ model Account {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
  
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
  
   @@unique([provider, providerAccountId])
 }
- 
-model Session {
-  id           String   @id @default(cuid())
-  sessionToken String   @unique
-  userId       String
-  expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
- 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
- 
-model VerificationToken {
-  identifier String
-  token      String
-  expires    DateTime
- 
-  @@unique([identifier, token])
-}
- 
-// Optional for WebAuthn support
-model Authenticator {
-  credentialID         String  @unique
-  userId               String
-  providerAccountId    String
-  credentialPublicKey  String
-  counter              Int
-  credentialDeviceType String
-  credentialBackedUp   Boolean
-  transports           String?
- 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
- 
-  @@id([userId, credentialID])
-}
+  
