@@ -1,7 +1,13 @@
 import { auth } from "@/auth";
 import { SignInButton } from "@/components/SignInButton";
 import { SignOutButton } from "@/components/SignOutButton";
+import { Metadata } from "next";
 import Image from "next/image";
+
+export const metadata: Metadata = {
+  title: "一起学习Next-auth",
+  description: "一起学习Next-auth",
+};
 
 export default async function Home() {
   const session = await auth();

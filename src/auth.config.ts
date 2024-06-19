@@ -1,14 +1,15 @@
-
 import type { NextAuthConfig } from "next-auth";
-import Gitee from "./lib/auth/provider/Gitee";
 
- 
 const AuthConfig: NextAuthConfig = {
   session: {
     // 使用JWT模式替换数据库模式，支持Nextjs的Edge模式
-    strategy: "jwt",  
+    strategy: "jwt",
+  }, 
+  providers:[],
+  pages: {
+    signIn: "/login",
   },
-  providers: [ Gitee ],
+
   callbacks: {
     session: async ({ session, token }) => {
       if (token?.sub) {
@@ -17,7 +18,6 @@ const AuthConfig: NextAuthConfig = {
       }
       return session;
     },
-     
   },
 };
 export { AuthConfig };
