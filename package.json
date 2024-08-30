@@ -3,30 +3,31 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbo ",
+    "dev": "next dev ",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "db:dev":"prisma migrate dev"
+    "db:dev": "prisma migrate dev",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
-    "@auth/prisma-adapter": "^2.1.0",
-    "@prisma/client": "^5.14.0",
-    "next": "15.0.0-canary.5",
-    "next-auth": "5.0.0-beta.18",
-    "react": "19.0.0-rc-f994737d14-20240522",
-    "react-dom": "19.0.0-rc-f994737d14-20240522"
+    "@auth/prisma-adapter": "^2.4.2",
+    "@prisma/client": "^5.19.0",
+    "crypto": "^1.0.1",
+    "next": "canary",
+    "next-auth": "beta",
+    "react": "next",
+    "react-dom": "next"
   },
   "devDependencies": {
-    "@types/pg": "^8.11.6",
-    "@types/node": "^20",
-    "@types/react": "^18",
-    "@types/react-dom": "^18",
-    "eslint": "^8",
-    "eslint-config-next": "v15.0.0-canary.1",
-    "postcss": "^8",
-    "prisma": "^5.14.0",
-    "tailwindcss": "^3.4.1",
-    "typescript": "^5"
+    "@types/node": "^20.16.2",
+    "@types/react": "^18.3.4",
+    "@types/react-dom": "^18.3.0",
+    "eslint": "^8.57.0",
+    "eslint-config-next": "15.0.0-canary.1",
+    "postcss": "^8.4.41",
+    "prisma": "^5.19.0",
+    "tailwindcss": "^3.4.10",
+    "typescript": "^5.5.4"
   }
 }

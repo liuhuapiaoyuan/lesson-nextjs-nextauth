@@ -72,7 +72,7 @@ export interface GiteeProfile {
  * @returns
  */
 export default function Gitee<P extends GiteeProfile>(
-  options: OAuthUserConfig<P>
+  options: OAuthUserConfig<P>  ={}
 ): OAuth2Config<P>   {
   const {
     clientId = process.env.AUTH_GITEE_ID!,
@@ -108,6 +108,7 @@ export default function Gitee<P extends GiteeProfile>(
       return {
         id: profile.id+"",
         name:profile.name,
+        username:profile.name,
         email:profile.email,
         image:profile.avatar_url 
       }

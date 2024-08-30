@@ -26,7 +26,7 @@ export default async function Home() {
         {session?.user && (
           <>
             <div>userId：{session?.user?.id}</div>
-            <div>昵称：{session?.user?.name}</div>
+            <div>昵称：{session?.user?.username}</div>
             <div className="flex gap-1 items-start">
               <div>头像：</div>
               <img
