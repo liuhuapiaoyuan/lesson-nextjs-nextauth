@@ -4,7 +4,7 @@
 
 ### 公众号验证码登录的原理
 
-![登录原理](qrcode.person.png)
+![登录原理](doc/qrcode.person.png)
 
 从原理上我们只要抓住几个核心的逻辑就能实现
 
