@@ -1,27 +1,24 @@
-import { auth } from "@/auth";
-import { SignInButton } from "@/components/SignInButton";
-import { SignOutButton } from "@/components/SignOutButton";
-import Image from "next/image";
+import { auth, signIn } from '@/auth'
 
-export default async function Home() {
-  const session = await auth();
+export default async function Page() {
+  const session = await auth()
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <div>当前账号信息 ：{session?.user?.email ?? "未登录"}</div>
-        <div className="flex gap-4">
-          <SignInButton />
-          {session?.user && <SignOutButton />}
-        </div>
-      </main>
+    <div className='flex flex-col gap-5 items-center justify-center h-screen w-full p-5'>
+      <h1>
+        账户信息:
+        {session?.user ? JSON.stringify(session.user) : '未登录'}
+      </h1>
+      <div>
+        <button
+          className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded'
+          onClick={async () => {
+            'use server'
+            await signIn('wechatmp')
+          }}
+        >
+          微信公众号验证码登录
+        </button>
+      </div>
     </div>
-  );
+  )
 }
