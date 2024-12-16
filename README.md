@@ -1,205 +1,131 @@
+# Nextjs 集成非认证公众号登录指南
 
+## 原理篇
 
+### 公众号验证码登录的原理
 
-## Next.js生态太差！一起干翻next-auth@5.0系列！(一)
+![登录原理](qrcode.person.png)
 
-不得不说，Next.js的生态和Spring Boot、Laravel、Django这些框架相比简直太差了。
+从原理上我们只要抓住几个核心的逻辑就能实现
 
-Next.js的官方文档也太简陋了，让人望而生畏。
+1. 提供微信消息接受的`webhook`地址，让微信消息能够正确的转发到我们的后台
+2. 基于某种缓存机制（比如redis\mysql\memory），提供验证码创建、核验的机制。
 
-作为一个前端开发者，我深知Next.js的强大功能，但我还是不得不说，Next.js的生态太差！
+想要手工实现上面的功能其实非常的容易，但是如果自己手工实现，会导致代码混乱，难以维护，并且如何跟已有的账户认证体系打通，也是个问题。所以我们选择利用`NextAuth`的第三方授权登录机制，通过`NextAuth`的`Next.js`集成，实现了上述的功能，代码量大大的降低，并且不会有任何的代码冗余，同时也能够和已有的认证体系进行集成。
 
-作为一个Next.js的爱好者，我深知Next.js的潜力，但我还是不得不说，Next.js的生态太差！
+### `NextAuth`改造思路
 
-作为一个Next.js的粉丝，我深知Next.js的魅力，但我还是不得不说，Next.js的生态太差！
+`NextAuth`提供了第三方登录的开发能力，我们之前也在此基础上实现了需要标准`oauth/oidc`的登录系统对接，但是，再这次我们的目标并不是标准化的第三方登录，那么改造工作就会变得有点麻烦，我们来思考一下：
 
-我们且说一套系统，最基本的就是账号系统，那么我们就先从账号系统出发！
+1. 利用`NextAuth`的`oauth`登录机制，当用户选择第三方登录后，会跳转到对应的配置项目`authorization`，我们可以将这个页面指定为对应的`二维码展示`页面
 
-## [Next-auth](https://authjs.dev/) 是什么？
+2. 开发一个`wechatmp/callback`来接收一个`webhook`消息
 
-Next-auth是一个用于管理用户身份验证的开源库，它可以帮助你快速添加用户注册、登录、密码重置、电子邮件确认、OAuth登录、JSON Web Tokens（JWT）等功能到你的Next.js应用中。
+3. 开发一个`qecode.html`来渲染二维码页面
 
-![alt text](image.png)
+4. 需要一种验证码管理机制，来管理创建的验证码以及对应的配对关系
 
-> 吐槽，Next-auth 几个大版本的调整，现在的用法已经非常简洁，但是因为v5大版本的变动，使得过去遇到的问题很难从网上找到，用法也有比较大的变更，甚至有一些不可预料的bug，需要通过`github`提交问题来尝试解决。
+![流程图](doc/LoginByWehcatMp.2.png)
 
+思路上非常简单，核心就是我们实现一个包含验证码分发，验证，二维码页渲染能力，微信消息hook能力的一种特殊的`公众号管理器`，他会以`ApiRoute`被继承到`nextjs`中
 
-### 准备工作：初始化项目
+我们从流程图中可以看出，公众号管理至少具备以下能力：
+
+- createCaptcha: 创建验证码
+- verifyCaptcha(openid,captcha): 验证验证码并绑定openid
+- renderQrCode: 渲染关注html页面
+- handleWechatMessage: 处理微信消息(webhook)
+
+为了适应`NextAuth`的`oauth`的能力，我们还需要做下面的改造：
+
+- 适配`authorization`页面 -> 校验成功后应该携带`code=验证码`返回`callback页面`
+- 适配`token`获取逻辑 -> 也就是通过上面写代码的验证码获得`openid`的能力
+
+## 实践篇
+
+通过上面的思路，我封装了一个开箱即用的`NextAuth`的插件`@next-auth-oauth/wechatmp`
+
+步骤如下：
+
+### 1. 安装`next-auth@beta`
+
+```bash
+npm install next-auth@beta
+```
+
+### 2. 安装`@next-auth-oauth/wechatmp`
+
+```bash
+npm install @next-auth-oauth/wechatmp
+```
+
+### 3.  实例化`Wehcatmp`并配置到`auth.ts`文件中
+
+```typescript
+import NextAuth from "next-auth"
+import Wehcatmp from '@next-auth-oauth/wechatmp'
+
+export const wechatMpProvder = Wehcatmp({
+    // 参数可以手工初始化，也可以让系统自动读取环境变量
+})
+ 
+export const { handlers, signIn, signOut, auth } = NextAuth({
+  providers: [ wechatMpProvder],
+})
+```
+
+### 4.  配置`/app/api/auth/wechatmp/route.ts`
+
+```javascript
+import { wechatMpProvder } from '@/auth'
+export const { GET, POST } = wechatMpProvder
+```
+
+### 5 配置环境变量
 
 ```shell
-pnpm dlx create-app-next@canary nextjs-nextauth
+AUTH_SECRET="gaXV7FBduowgbb8jfj3mmHXwyyWGhVJCy8WVlOzCg04=" # Added by `npx auth`. Read more: https://cli.authjs.dev
+# 微信公众号登录
+AUTH_WECHATMP_APPID= 
+AUTH_WECHATMP_APPSECRET= 
+AUTH_WECHATMP_TOKEN= 
+AUTH_WECHATMP_CHECKTYPE=MESSAGE
+AUTH_WECHATMP_AESKEY= 
+AUTH_WECHATMP_ENDPOINT=http://localhost:3000/api/auth/wechatmp
+AUTH_WECHATMP_QRCODE_IMAGE_URL= 
+
 ```
-> 注意，这里使用 **`canary`** 版本，因为最新版的next@rc版本有一些bug未修复，导致无法使用next-auth的`middleware`。
 
-### 安装next-auth@beat 
-
-> 本次案例体验的是最新的Next-auth@5.0系列，所以选择Beat
-
-``` shell
-pnpm add next-auth@beta
-```
-
-
-### 准备工作：生成环境变量
-
-```shell
-npx auth secret
-Secret generated. Copy it to your .env/.env.local file (depending on your framework):
-AUTH_SECRET=l35ZyaGsZmc3JOFBf3JJy+mMzyeMJlQqr8zMA6mBB7U=
-```
-按照指引复制到.env/.env.local文件中 ， 该key是作为cookie sessionid的加密key
-
-
-
-## 代码开始 案例：最小可运行demo
-
-![alt text](image-1.png)
-
-
-这个案例非常简单，配置一个登录组件，就可以获得系统登录能力。系统尽量使用最新的`ServerAction`特性进行展示 。
-
-
-> 创建`auth.js`
+### 6. 创建演示页面
 
 ```typescript
-import NextAuth, { NextAuthConfig } from "next-auth";
-import Credentials from "next-auth/providers/credentials";
+import { auth, signIn } from '@/auth'
 
-
-// 模拟账号服务，实际上应该到数据库等渠道检索查询
-async function mockUser(username:string , password:string){
-  if(password!=='123456'){
-    return null
-  }
-  return {
-    id:Math.random().toString(36).substr(2, 9),
-    name: username,
-    email: username + "@mock.com",
-  }
-}
-// 登录配置
-const config: NextAuthConfig = {
-  providers: [
-    Credentials({
-      credentials: {
-        username: { label: "账号" },
-        password: { label: "密码", type: "password" },
-      },
-      authorize: async ({username,password}) => mockUser(username+"",password+""), 
-    }),
-  ],
-};
-export const { signIn , signOut, auth, handlers } = NextAuth(config);
-
-```
-
-> 创建`src/app/api/auth/[...nextauth]/route.ts`
-
-```typescript
-import { handlers } from "@/auth"
-export const { GET, POST } = handlers
-```
-
-> 创建 `src/middleware.ts` 
-```typescript   
-export { auth as middleware } from "@/auth";
-```
-
-> 创建登录组件： `src/components/SignInButton.tsx`
-```typescript
-import { signIn } from "@/auth";
-
-export function SignInButton() {
+export default async function Page() {
+  const session = await auth()
   return (
-    <form
-      action={async () => {
-        "use server";
-        await signIn();
-      }}
-    >
-      <button
-        className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-        type="submit"
-      >
-        登录系统
-      </button>
-    </form>
-  );
-}
-```
-
-> 创建登出组件 `src/components/SignOutButton.tsx`
-
-```typescript
-import { signOut } from "@/auth";
-
-export function SignOutButton() {
-  return (
-    <form
-      action={async () => {
-        "use server";
-        await signOut();
-      }}
-    >
-      <button
-        className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-[#cf3434] text-background gap-2 hover:bg-[#680505] dark:hover:bg-[#b93636] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-        type="submit"
-      >
-        退出系统
-      </button>
-    </form>
-  );
-}
-
-```
-
-
-> 创建展示页面： `src/app/page.tsx`
-
-```typescript
-import { auth } from "@/auth";
-import { SignInButton } from "@/components/SignInButton";
-import { SignOutButton } from "@/components/SignOutButton";
-import Image from "next/image";
-
-export default async function Home() {
-  const session = await auth();
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <div>当前账号信息 ：{session?.user?.email ?? "未登录"}</div>
-        <div className="flex gap-4">
-          <SignInButton />
-          {session?.user && <SignOutButton />}
-        </div>
-      </main>
+    <div>
+      <h1>
+        账户信息:
+        {session?.user ? JSON.stringify(session.user) : '未登录'}
+      </h1>
+      <div>
+        <button
+          onClick={async () => {
+            'use server'
+            await signIn('wechatmp')
+          }}
+        >
+          微信公众号验证码登录
+        </button>
+      </div>
     </div>
-  );
+  )
 }
+
 ```
 
-
-代码仓库：[https://github.com/liuhuapiaoyuan/lesson-nextjs-nextauth.git](https://github.com/liuhuapiaoyuan/lesson-nextjs-nextauth.git)
-
-
-### 思考
-
-上面一个代码集成起来虽然简单，但实际上我们需要的登录/权限管理的功能远不止这些，比如：
-
-- 多种登录方式：比如邮箱、手机号、GITHUB,GOOGLE等
-- 账号信息如何保存？多种渠道授权登录如何保存？
-- 如何开发特定的provider，来适配国内的 `微信登录`,`小程序登录`,`QQ`等渠道
-- 多种登录方式的联动：比如手机号登录可以绑定微信、微博等
-- 授权问题解决了，如何解决鉴权问题？(多种权限控制：比如管理员、普通用户、游客等)
-
-`Next-Auth`虽然提供了很多功能，但是要集成到系统中，我们还需要做很多准备工作。作为一款授权服务的框架，`Next-Auth`的功能和生态都很强大，但是我们需要自己去摸索，才能真正掌握它。
-
-再接下来的系列，我们来盘他！
+![启动参数](doc/LoginByWehcatMp.5.png)
+![登录按钮](doc/LoginByWehcatMp.3.png)
+![登录页面](doc/LoginByWehcatMp.4.png)
+![登录成功](doc/LoginByWehcatMp.6.png)
