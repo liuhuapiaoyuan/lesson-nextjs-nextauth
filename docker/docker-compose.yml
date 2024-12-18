@@ -1,0 +1,7 @@
+services:
+  nextjs-nextauth-wechatmp:
+    image: liuhuapiaoyuan/nextjs-nextauth-wechatmp
+    ports:
+      - '3985:3000' 
+    env_file:
+      - .env
